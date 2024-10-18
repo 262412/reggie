@@ -36,7 +36,7 @@ dependencies {
     implementation 'io.github.classgraph:classgraph:4.8.112'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0'
-    implementation 'com.github.pagehelper:pagehelper-spring-boot-starter:1.4.6'
+    //implementation 'com.github.pagehelper:pagehelper-spring-boot-starter:1.4.6'
     implementation 'com.aliyun.oss:aliyun-sdk-oss:3.17.4'
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
     implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
@@ -46,7 +46,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-aop'
     implementation 'com.baomidou:mybatis-plus-boot-starter:3.5.7'
     implementation 'com.baomidou:mybatis-plus-generator:3.5.7'
-    implementation 'com.github.jsqlparser:jsqlparser:4.4' // 请根据需要选择合适的版本
+    implementation 'com.github.jsqlparser:jsqlparser:4.7' // 请根据需要选择合适的版本
 
 }
 

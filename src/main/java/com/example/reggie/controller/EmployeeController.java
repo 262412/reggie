@@ -1,6 +1,8 @@
 package com.example.reggie.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.reggie.common.R;
 import com.example.reggie.entity.Employee;
 import com.example.reggie.service.EmployeeService;
@@ -8,10 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.DigestUtils;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 
@@ -81,16 +80,44 @@ public class EmployeeController {
         // 返回登出成功结果
         return R.success("退出成功");
     }
+    /**
+     * 处理POST请求以保存员工信息
+     *
+     * @param request HTTP请求对象，用于获取当前会话的员工ID
+     * @param employee 员工对象，包含要保存的员工信息
+     * @return 返回表示保存操作结果的字符串消息
+     */
     @PostMapping
     public R<String> save(HttpServletRequest request, @RequestBody Employee employee){
+        // 记录新增员工的日志信息
         log.info("新增员工，员工信息：{}", employee.toString());
+
+        // 设置员工的密码为MD5加密后的"123456"
         employee.setPassword(DigestUtils.md5DigestAsHex("123456".getBytes()));
+
+        // 设置员工的创建时间和更新时间为当前系统时间
         employee.setCreateTime(LocalDateTime.now());
         employee.setUpdateTime(LocalDateTime.now());
+
+        // 从会话中获取当前员工ID并设置为新增员工的创建人和更新人
         Long empId = (Long) request.getSession().getAttribute("employee");
         employee.setCreateUser(empId);
         employee.setUpdateUser(empId);
+
+        // 调用员工服务层接口的save方法保存员工信息
         employeeService.save(employee);
+
+        // 返回成功保存员工信息的消息
         return R.success("新增员工成功");
+    }
+    @GetMapping("/page")
+    public R<Page> page(int page, int pageSize, String name) {
+        log.info("page = {}, pageSize = {}, name = {}", page, pageSize, name);
+        Page pageInfo = new Page(page, pageSize);
+        LambdaQueryWrapper<Employee> queryWrapper = new LambdaQueryWrapper();
+        queryWrapper.like(StringUtils.isNotEmpty(name), Employee::getName, name);
+        queryWrapper.orderByDesc(Employee::getUpdateTime);
+        employeeService.page(pageInfo, queryWrapper);
+        return R.success(pageInfo);
     }
 }
