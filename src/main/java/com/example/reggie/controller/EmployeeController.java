@@ -110,14 +110,50 @@ public class EmployeeController {
         // 返回成功保存员工信息的消息
         return R.success("新增员工成功");
     }
+    /**
+     * 根据页面编号、页面大小和员工姓名查询员工分页信息
+     * 此方法用于处理GET请求，根据提供的页面编号、页面大小和可选的员工姓名进行分页查询
+     *
+     * @param page 页面编号，表示请求的页码
+     * @param pageSize 页面大小，表示每页显示的记录数
+     * @param name 员工姓名，用于模糊查询
+     * @return 返回一个封装了分页查询结果的对象
+     */
     @GetMapping("/page")
     public R<Page> page(int page, int pageSize, String name) {
+        // 记录日志，输出请求参数信息
         log.info("page = {}, pageSize = {}, name = {}", page, pageSize, name);
+
+        // 创建一个Page对象，用于封装分页查询的信息
         Page pageInfo = new Page(page, pageSize);
-        LambdaQueryWrapper<Employee> queryWrapper = new LambdaQueryWrapper();
+
+        // 创建一个LambdaQueryWrapper对象，用于构建查询条件
+        LambdaQueryWrapper<Employee> queryWrapper = new LambdaQueryWrapper<>();
+
+        // 如果name参数不为空，则添加模糊查询条件
         queryWrapper.like(StringUtils.isNotEmpty(name), Employee::getName, name);
+
+        // 添加排序条件，按更新时间降序排列
         queryWrapper.orderByDesc(Employee::getUpdateTime);
+
+        // 调用employeeService的page方法执行分页查询
         employeeService.page(pageInfo, queryWrapper);
+
+        // 返回封装了分页查询结果的对象
         return R.success(pageInfo);
+    }
+    @PutMapping
+    public R<String> update(HttpServletRequest request, @RequestBody Employee employee){
+        // 记录更新员工信息的日志信息
+        log.info(employee.toString());
+
+        // 从会话中获取当前员工ID并设置为更新人的ID
+        Long empId = (Long) request.getSession().getAttribute("employee");
+        employee.setUpdateUser(empId);
+        employee.setUpdateTime(LocalDateTime.now());
+
+        // 调用员工服务层接口的updateById方法更新员工信息
+        employeeService.updateById(employee);
+        return R.success("员工信息修改成功");
     }
 }

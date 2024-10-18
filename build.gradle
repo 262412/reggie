@@ -46,7 +46,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-aop'
     implementation 'com.baomidou:mybatis-plus-boot-starter:3.5.7'
     implementation 'com.baomidou:mybatis-plus-generator:3.5.7'
-    implementation 'com.github.jsqlparser:jsqlparser:4.7' // 请根据需要选择合适的版本
+    implementation 'com.github.jsqlparser:jsqlparser:4.7'
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-cbor:2.12.1'
 
 }
 
