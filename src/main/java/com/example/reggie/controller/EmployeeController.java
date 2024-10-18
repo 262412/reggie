@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
+
 
 @Slf4j
 @RestController
@@ -78,5 +80,17 @@ public class EmployeeController {
 
         // 返回登出成功结果
         return R.success("退出成功");
+    }
+    @PostMapping
+    public R<String> save(HttpServletRequest request, @RequestBody Employee employee){
+        log.info("新增员工，员工信息：{}", employee.toString());
+        employee.setPassword(DigestUtils.md5DigestAsHex("123456".getBytes()));
+        employee.setCreateTime(LocalDateTime.now());
+        employee.setUpdateTime(LocalDateTime.now());
+        Long empId = (Long) request.getSession().getAttribute("employee");
+        employee.setCreateUser(empId);
+        employee.setUpdateUser(empId);
+        employeeService.save(employee);
+        return R.success("新增员工成功");
     }
 }
