@@ -44,7 +44,10 @@ dependencies {
     implementation 'javax.xml.bind:jaxb-api:2.3.1'
     implementation 'com.alibaba:fastjson:2.0.15'
     implementation 'org.springframework.boot:spring-boot-starter-aop'
-    implementation 'com.baomidou:mybatis-plus-boot-starter:3.5.3'
+    implementation 'com.baomidou:mybatis-plus-boot-starter:3.5.7'
+    implementation 'com.baomidou:mybatis-plus-generator:3.5.7'
+    implementation 'com.github.jsqlparser:jsqlparser:4.4' // 请根据需要选择合适的版本
+
 }
 
 tasks.named('test') {
