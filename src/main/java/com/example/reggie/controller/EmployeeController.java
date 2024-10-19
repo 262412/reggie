@@ -96,13 +96,13 @@ public class EmployeeController {
         employee.setPassword(DigestUtils.md5DigestAsHex("123456".getBytes()));
 
         // 设置员工的创建时间和更新时间为当前系统时间
-        employee.setCreateTime(LocalDateTime.now());
-        employee.setUpdateTime(LocalDateTime.now());
+        //employee.setCreateTime(LocalDateTime.now());
+        //employee.setUpdateTime(LocalDateTime.now());
 
         // 从会话中获取当前员工ID并设置为新增员工的创建人和更新人
-        Long empId = (Long) request.getSession().getAttribute("employee");
-        employee.setCreateUser(empId);
-        employee.setUpdateUser(empId);
+        //Long empId = (Long) request.getSession().getAttribute("employee");
+        //employee.setCreateUser(empId);
+        //employee.setUpdateUser(empId);
 
         // 调用员工服务层接口的save方法保存员工信息
         employeeService.save(employee);
@@ -146,22 +146,34 @@ public class EmployeeController {
     public R<String> update(HttpServletRequest request, @RequestBody Employee employee){
         // 记录更新员工信息的日志信息
         log.info(employee.toString());
+        long id = Thread.currentThread().getId();
+        log.info("线程id为：{}", id);
 
         // 从会话中获取当前员工ID并设置为更新人的ID
-        Long empId = (Long) request.getSession().getAttribute("employee");
-        employee.setUpdateUser(empId);
-        employee.setUpdateTime(LocalDateTime.now());
+        //Long empId = (Long) request.getSession().getAttribute("employee");
+        //employee.setUpdateUser(empId);
+        //employee.setUpdateTime(LocalDateTime.now());
 
         // 调用员工服务层接口的updateById方法更新员工信息
         employeeService.updateById(employee);
         return R.success("员工信息修改成功");
     }
+    /**
+     * 根据员工ID获取员工信息
+     *
+     * @param id 员工ID，用于唯一标识一个员工
+     * @return 返回一个封装了员工信息的响应对象如果未找到对应的员工信息，则返回一个错误信息
+     */
     @GetMapping("/{id}")
     public R<Employee> getById(@PathVariable Long id){
+        // 通过员工ID调用服务层方法获取员工对象
         Employee employee = employeeService.getById(id);
+        // 检查获取的员工对象是否为空
         if (employee != null){
+            // 如果员工对象不为空，说明成功找到了对应的员工信息，返回成功响应
             return R.success(employee);
         }
+        // 如果员工对象为空，说明没有找到对应的员工信息，返回错误响应
         return R.error("没有查询到对应员工信息");
     }
 }
