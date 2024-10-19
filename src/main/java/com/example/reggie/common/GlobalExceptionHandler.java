@@ -34,5 +34,10 @@ public class GlobalExceptionHandler {
         // 如果异常消息不匹配已知的错误类型，返回通用的错误信息
         return R.error("未知错误");
     }
+    @ExceptionHandler(CustomException.class)
+    public R<String> exceptionHandler(CustomException ex) {
+        log.error(ex.getMessage());
+        return R.error(ex.getMessage());
+    }
 }
 
