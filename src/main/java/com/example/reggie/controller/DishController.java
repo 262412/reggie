@@ -111,5 +111,18 @@ public class DishController {
         // 返回成功响应，表示菜品更新成功
         return R.success("修改菜品成功");
     }
+    @GetMapping("/list")
+    public R<List<Dish>> list(Dish dish) {
+        // 创建一个LambdaQueryWrapper对象，用于构建查询条件
+        LambdaQueryWrapper<Dish> queryWrapper = new LambdaQueryWrapper<>();
+        // 添加查询条件，根据菜品状态进行过滤
+        queryWrapper.eq(Dish::getStatus, 1);
+        // 添加查询条件，根据菜品分类ID进行过滤
+        queryWrapper.eq(dish.getCategoryId() != null, Dish::getCategoryId, dish.getCategoryId());
+        // 添加排序条件，按更新时间降序排列
+        queryWrapper.orderByDesc(Dish::getUpdateTime);
+        List<Dish> list = dishService.list(queryWrapper);
+        return R.success(list);
+    }
 }
 
