@@ -9,6 +9,7 @@ import com.example.reggie.entity.Setmeal;
 import com.example.reggie.service.CategoryService;
 import com.example.reggie.service.SetmealDishService;
 import com.example.reggie.service.SetmealService;
+import jakarta.websocket.server.PathParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,4 +90,12 @@ public class SetmealController {
         // 返回包含分页信息和套餐数据的响应对象
         return R.success(dtoPage);
     }
+    @DeleteMapping
+    public R<String> delete(@RequestParam List<Long> ids){
+        // 调用setmealService的removeBatchByIds方法，处理批量删除操作
+        setmealService.removeWithDish(ids);
+        // 返回成功响应，表示套餐删除成功
+        return R.success("删除成功");
+    }
+
 }

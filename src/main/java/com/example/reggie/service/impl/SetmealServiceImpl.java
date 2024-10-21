@@ -1,5 +1,6 @@
 package com.example.reggie.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.reggie.dto.SetmealDto;
 import com.example.reggie.entity.Setmeal;
@@ -43,5 +44,32 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
 
         // 批量保存套餐菜品信息
         setmealDishService.saveBatch(setmealDishes);
+    }
+
+    /**
+     * 根据多个ID删除套餐及其关联的菜品
+     * 此方法首先检查给定的套餐是否正在售卖中，如果是，则抛出异常，防止删除正在售卖的套餐
+     * 如果套餐不在售卖中，则删除套餐表中的套餐记录以及关联的菜品记录
+     *
+     * @param ids 要删除的套餐ID列表
+     * @throws RuntimeException 如果套餐正在售卖中，则抛出运行时异常
+     */
+    @Transactional
+    public void removeWithDish(List<Long> ids) {
+        //查询套餐状态，确定是否可以删除
+        LambdaQueryWrapper<Setmeal> queryWrapper = new LambdaQueryWrapper();
+        queryWrapper.in(Setmeal::getId,ids);
+        queryWrapper.eq(Setmeal::getStatus,1);
+        int count = (int) this.count(queryWrapper);
+        if(count > 0){
+            //如果不能删除，抛出业务异常
+            throw new RuntimeException("套餐正在售卖中，不能删除");
+        }
+        //如果可以删除，先删除套餐表中的数据
+        this.removeByIds(ids);
+        //删除关系表中的数据
+        LambdaQueryWrapper<SetmealDish> lambdaQueryWrapper = new LambdaQueryWrapper();
+        lambdaQueryWrapper.in(SetmealDish::getSetmealId,ids);
+        setmealDishService.remove(lambdaQueryWrapper);
     }
 }
