@@ -22,19 +22,22 @@ import java.util.Map;
 @Slf4j
 public class UserController {
 
+    // 自动注入UserService
     @Autowired
     private UserService userService;
 
     /**
      * 发送手机短信验证码
-     * @param user
-     * @return
+     * @param user 用户对象，包含手机号
+     * @param session HTTP会话，用于保存验证码
+     * @return 返回表示操作结果的字符串
      */
     @PostMapping("/sendMsg")
     public R<String> sendMsg(@RequestBody User user, HttpSession session){
         //获取手机号
         String phone = user.getPhone();
 
+        // 检查手机号是否非空
         if(StringUtils.isNotEmpty(phone)){
             //生成随机的4位验证码
             String code = ValidateCodeUtils.generateValidateCode(4).toString();
@@ -54,9 +57,9 @@ public class UserController {
 
     /**
      * 移动端用户登录
-     * @param map
-     * @param session
-     * @return
+     * @param map 包含手机号和验证码的映射
+     * @param session HTTP会话，用于保存用户信息
+     * @return 返回表示登录结果的User对象
      */
     @PostMapping("/login")
     public R<User> login(@RequestBody Map map, HttpSession session){
@@ -91,5 +94,4 @@ public class UserController {
         }
         return R.error("登录失败");
     }
-
 }
