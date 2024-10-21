@@ -91,5 +91,25 @@ public class DishController {
         // 返回包含转换后数据的 dishDtoPage 对象
         return R.success(dishDtoPage);
     }
+    /**
+     * 根据菜品ID获取菜品及其口味信息
+     *
+     * @param id 菜品ID，用于唯一标识一个菜品
+     * @return 返回一个响应对象，包含菜品及其口味信息
+     */
+    @GetMapping("/{id}")
+    public R<DishDto> get(@PathVariable Long id) {
+        // 调用服务层方法，根据菜品ID获取菜品及其口味信息
+        DishDto dishDto = dishService.getByIdWithFlavor(id);
+        // 返回成功响应，包含菜品及其口味信息
+        return R.success(dishDto);
+    }
+    @PutMapping
+    public R<String> update(@RequestBody DishDto dishDto) {
+        // 调用服务层方法，更新菜品及其口味信息
+        dishService.updateWithFlavor(dishDto);
+        // 返回成功响应，表示菜品更新成功
+        return R.success("修改菜品成功");
+    }
 }
 
