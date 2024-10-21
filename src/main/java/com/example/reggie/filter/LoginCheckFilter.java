@@ -41,7 +41,10 @@ public class LoginCheckFilter implements Filter {
                 "/employee/login",
                 "/employee/logout",
                 "/backend/**",
-                "/front/**"
+                "/front/**",
+                "/common/**",
+                "/user/sendMsg",
+                "/user/login"
         };
         // 检查当前请求是否在定义的不需要处理的URL数组中
         boolean check = check(urls, requestURI);
@@ -57,6 +60,14 @@ public class LoginCheckFilter implements Filter {
             log.info("用户已登录，用户id为：{}", request.getSession().getAttribute("employee"));
             Long empId = (Long) request.getSession().getAttribute("employee");
             BaseContext.setCurrentId(empId);
+            filterChain.doFilter(request, response);
+            return;
+        }
+        if(request.getSession().getAttribute("user")!= null){
+            // 如果用户已登录，记录日志并继续执行过滤链
+            log.info("用户已登录，用户id为：{}", request.getSession().getAttribute("user"));
+            Long userId = (Long) request.getSession().getAttribute("user");
+            BaseContext.setCurrentId(userId);
             filterChain.doFilter(request, response);
             return;
         }
