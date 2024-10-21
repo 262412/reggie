@@ -97,5 +97,24 @@ public class SetmealController {
         // 返回成功响应，表示套餐删除成功
         return R.success("删除成功");
     }
-
+    /**
+     * 处理套餐列表查询请求
+     * 该方法用于根据分类ID和状态查询套餐列表
+     *
+     * @param setmeal 包含查询条件的套餐对象
+     * @return 返回查询结果列表的响应对象
+     */
+    @GetMapping("/list")
+    public R<List<Setmeal>> list(Setmeal setmeal){
+        // 创建LambdaQueryWrapper对象用于条件查询
+        LambdaQueryWrapper<Setmeal> queryWrapper = new LambdaQueryWrapper<>();
+        // 添加查询条件，根据分类ID和状态来查询套餐
+        queryWrapper.eq(setmeal.getCategoryId() != null, Setmeal::getCategoryId, setmeal.getCategoryId());
+        queryWrapper.eq(setmeal.getStatus() != null, Setmeal::getStatus,setmeal.getStatus());
+        // 添加排序条件，按更新时间降序排列
+        queryWrapper.orderByDesc(Setmeal::getUpdateTime);
+        // 执行查询并返回结果
+        List<Setmeal> list = setmealService.list(queryWrapper);
+        return R.success(list);
+    }
 }
