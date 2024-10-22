@@ -22,11 +22,9 @@ public class SMSUtils {
      * @param param 参数
      */
     public static void sendMessage(String signName, String templateCode,String phoneNumbers,String param){
-        String accessKeyId = System.getenv("ALIBABA_CLOUD_ACCESS_KEY");
-        String accessKeySecret = System.getenv("ALIBABA_CLOUD_ACCESS_SECRET");
-        log.info("AccessKey ID: {}", accessKeyId);
-        log.info("AccessKey Secret: {}", accessKeySecret);
-        DefaultProfile profile = DefaultProfile.getProfile("cn-shanghai", accessKeyId, accessKeySecret);
+        DefaultProfile profile = DefaultProfile.getProfile("cn-shanghai",
+                System.getenv("ALIBABA_CLOUD_ACCESS_KEY_ID"),
+                System.getenv("ALIBABA_CLOUD_ACCESS_KEY_SECRET"));
         IAcsClient client = new DefaultAcsClient(profile);
 
         SendSmsRequest request = new SendSmsRequest();
