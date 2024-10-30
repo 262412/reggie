@@ -48,7 +48,7 @@ public class UserController {
             log.info("code={}",code);
 
             //调用阿里云提供的短信服务API完成发送短信
-            SMSUtils.sendMessage("瑞吉外卖","SMS_474930790",phone,code);
+            SMSUtils.sendMessage("瑞吉外卖登录检测","SMS_474930790",phone,code);
 
             //session.setAttribute(phone,code);
             redisTemplate.opsForValue().set(phone,code,5, TimeUnit.MINUTES);
