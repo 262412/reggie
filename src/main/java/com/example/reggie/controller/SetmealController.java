@@ -13,6 +13,8 @@ import jakarta.websocket.server.PathParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -40,6 +42,7 @@ public class SetmealController {
      * @return 返回一个表示操作结果的响应对象，包含成功消息
      */
     @PostMapping
+    @CacheEvict(value = "setMealCache", allEntries = true)
     public R<String> save(@RequestBody SetmealDto setmealDto){
         // 记录日志，表明开始新增套餐的操作
         log.info("新增套餐");
@@ -91,6 +94,7 @@ public class SetmealController {
         return R.success(dtoPage);
     }
     @DeleteMapping
+    @CacheEvict(value = "setMealCache", allEntries = true)
     public R<String> delete(@RequestParam List<Long> ids){
         // 调用setmealService的removeBatchByIds方法，处理批量删除操作
         setmealService.removeWithDish(ids);
@@ -105,6 +109,7 @@ public class SetmealController {
      * @return 返回查询结果列表的响应对象
      */
     @GetMapping("/list")
+    @Cacheable(value = "setMealCache", key = "#setmeal.categoryId + '_' + #setmeal.status")
     public R<List<Setmeal>> list(Setmeal setmeal){
         // 创建LambdaQueryWrapper对象用于条件查询
         LambdaQueryWrapper<Setmeal> queryWrapper = new LambdaQueryWrapper<>();
