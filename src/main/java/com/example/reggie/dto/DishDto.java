@@ -3,9 +3,12 @@ package com.example.reggie.dto;
 import com.example.reggie.entity.Dish;
 import com.example.reggie.entity.DishFlavor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+
 import java.util.ArrayList;
 import java.util.List;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 public class DishDto extends Dish {
 
