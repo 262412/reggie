@@ -23,4 +23,4 @@ mybatis-plus:
     db-config:
       id-type: ASSIGN_ID
 reggie:
-  path: D:/
+  path: D:/images/

@@ -12,9 +12,11 @@ import com.example.reggie.service.DishFlavorService;
 import com.example.reggie.service.DishService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @RestController
@@ -33,6 +35,8 @@ public class DishController {
     private DishFlavorService dishFlavorService;
     @Autowired
     private CategoryService categoryService;
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     /**
      * 处理新增菜品的请求
@@ -131,6 +135,20 @@ public class DishController {
 //    }
     @GetMapping("/list")
     public R<List<DishDto>> list(Dish dish) {
+        // 初始化dishDtoList为null，用于后续存储从缓存中获取的菜品信息列表
+        List<DishDto> dishDtoList = null;
+
+        // 构造缓存键，基于菜品的类别ID和状态，以便于缓存中数据的检索
+        String key = "dish_" + dish.getCategoryId() + "_" + dish.getStatus();
+
+        // 从Redis缓存中获取与构造的键对应的菜品信息列表
+        dishDtoList = (List<DishDto>) redisTemplate.opsForValue().get(key);
+
+        // 检查从缓存中获取的数据是否为空
+        if (dishDtoList != null) {
+            // 如果缓存中存在对应的数据，则直接返回缓存中的数据
+            return R.success(dishDtoList);
+        }
         // 创建一个LambdaQueryWrapper对象，用于构建查询条件
         LambdaQueryWrapper<Dish> queryWrapper = new LambdaQueryWrapper<>();
         // 添加查询条件，根据菜品状态进行过滤
@@ -142,7 +160,7 @@ public class DishController {
         // 使用查询条件获取菜品列表
         List<Dish> list = dishService.list(queryWrapper);
         // 将菜品列表转换为菜品DTO列表，以便于传输或展示
-        List<DishDto> dishDtoList = list.stream().map(item -> {
+        dishDtoList = list.stream().map(item -> {
             // 创建一个新的菜品DTO对象
             DishDto dishDto = new DishDto();
             // 将菜品对象的属性复制到菜品DTO对象中
@@ -169,6 +187,7 @@ public class DishController {
             // 返回菜品DTO对象
             return dishDto;
         }).collect(Collectors.toList());
+        redisTemplate.opsForValue().set(key, dishDtoList, 60, TimeUnit.MINUTES);
         // 返回菜品DTO列表
         return R.success(dishDtoList);
     }
