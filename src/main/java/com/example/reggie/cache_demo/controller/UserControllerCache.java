@@ -17,17 +17,19 @@ import java.util.List;
 @RequestMapping("/user")
 @Slf4j
 public class UserControllerCache {
-
+    // 自动注入CacheManager，用于管理缓存
     @Autowired
     private CacheManager cacheManager;
 
+    // 自动注入UserCacheService，用于处理用户缓存相关的业务逻辑
     @Autowired
     private UserCacheService userService;
 
     /**
-     * CachePut：将方法返回值放入缓存
-     * value：缓存的名称，每个缓存名称下面可以有多个key
-     * key：缓存的key
+     * 使用CachePut注解将方法返回值放入缓存
+     * value：指定缓存的名称，此处为"userCache"
+     * key：指定缓存的key，此处为用户ID
+     * 这个方法在更新用户信息后，会将新的用户信息存入缓存
      */
     @CachePut(value = "userCache",key = "#user.id")
     @PostMapping
@@ -37,21 +39,23 @@ public class UserControllerCache {
     }
 
     /**
-     * CacheEvict：清理指定缓存
-     * value：缓存的名称，每个缓存名称下面可以有多个key
-     * key：缓存的key
+     * 使用CacheEvict注解清理指定缓存
+     * value：指定缓存的名称，此处为"userCache"
+     * key：指定缓存的key，此处为用户ID
+     * 当删除用户时，同时清除缓存中的用户信息
      */
     @CacheEvict(value = "userCache",key = "#p0")
-    //@CacheEvict(value = "userCache",key = "#root.args[0]")
-    //@CacheEvict(value = "userCache",key = "#id")
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id){
         userService.removeById(id);
     }
 
-    //@CacheEvict(value = "userCache",key = "#p0.id")
-    //@CacheEvict(value = "userCache",key = "#user.id")
-    //@CacheEvict(value = "userCache",key = "#root.args[0].id")
+    /**
+     * 使用CacheEvict注解清理指定缓存
+     * value：指定缓存的名称，此处为"userCache"
+     * key：指定缓存的key，此处为用户ID
+     * 这个方法在更新用户信息后，会清除缓存中的旧信息
+     */
     @CacheEvict(value = "userCache",key = "#result.id")
     @PutMapping
     public UserCache update(UserCache user){
@@ -60,11 +64,11 @@ public class UserControllerCache {
     }
 
     /**
-     * Cacheable：在方法执行前spring先查看缓存中是否有数据，如果有数据，则直接返回缓存数据；若没有数据，调用方法并将方法返回值放到缓存中
-     * value：缓存的名称，每个缓存名称下面可以有多个key
-     * key：缓存的key
-     * condition：条件，满足条件时才缓存数据
-     * unless：满足条件则不缓存
+     * 使用Cacheable注解在方法执行前查看缓存中是否有数据
+     * value：指定缓存的名称，此处为"userCache"
+     * key：指定缓存的key，此处为用户ID
+     * unless：当结果为null时不缓存
+     * 当获取用户信息时，首先查看缓存中是否有数据，如果有则直接返回缓存数据
      */
     @Cacheable(value = "userCache",key = "#id",unless = "#result == null")
     @GetMapping("/{id}")
@@ -73,6 +77,12 @@ public class UserControllerCache {
         return user;
     }
 
+    /**
+     * 使用Cacheable注解在方法执行前查看缓存中是否有数据
+     * value：指定缓存的名称，此处为"userCache"
+     * key：指定缓存的key，此处为用户ID和名称的组合
+     * 这个方法用于查询用户列表，根据用户ID和名称进行筛选
+     */
     @Cacheable(value = "userCache",key = "#user.id + '_' + #user.name")
     @GetMapping("/list")
     public List<UserCache> list(UserCache user){
