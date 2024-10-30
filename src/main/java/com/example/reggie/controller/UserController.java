@@ -31,6 +31,7 @@ public class UserController {
     @Autowired
     private RedisTemplate redisTemplate;
 
+
     /**
      * 发送手机短信验证码
      * @param user 用户对象，包含手机号

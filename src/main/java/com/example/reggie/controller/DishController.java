@@ -16,6 +16,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -50,6 +51,10 @@ public class DishController {
     public R<String> save(@RequestBody DishDto dishDto) {
         // 调用菜品服务类的保存方法，该方法会同时保存菜品及其口味信息
         dishService.saveWithFlavor(dishDto);
+        //        Set keys = redisTemplate.keys("dish_*");
+        //        redisTemplate.delete(keys);
+        String key = "dish_" + dishDto.getCategoryId() + "_1";
+        redisTemplate.delete(key);
         // 返回成功响应，表示菜品新增成功
         return R.success("新增菜品成功");
     }
@@ -116,7 +121,11 @@ public class DishController {
     public R<String> update(@RequestBody DishDto dishDto) {
         // 调用服务层方法，更新菜品及其口味信息
         dishService.updateWithFlavor(dishDto);
-        // 返回成功响应，表示菜品更新成功
+//        Set keys = redisTemplate.keys("dish_*");
+//        redisTemplate.delete(keys);
+        String key = "dish_" + dishDto.getCategoryId() + "_1";
+        redisTemplate.delete(key);
+        // 返回成功响应，表示菜品更新功
         return R.success("修改菜品成功");
     }
 
